@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import sendgrid
 from sendgrid.helpers.mail import * # info drawn from send notification exercise.
+import datetime
 
 load_dotenv()
 
@@ -13,6 +14,13 @@ SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "OOPS, please set env var 
 MY_EMAIL_ADDRESS = os.environ.get("MY_EMAIL_ADDRESS", "OOPS, please set env var called 'MY_EMAIL_ADDRESS'")
 
 sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
+
+#background
+    #install packages
+    #set up API 
+    #env with sendgrid API, dummy library emails
+    #use web scraper to get ISBN, author, and cover for Goodreads/Amazon
+    #set up lists to demo
 
 #lender_list = [amyklopfen, dougschulte, sarahlazun]
 
@@ -58,6 +66,8 @@ print("Welcome to bookshare, a community of mini-libraries. Search for a title, 
 #set up profile - append email to user email list
 my_user_name = input("Enter a username to get started: ")
 
+#lending
+
 library_create = input("Would you like to set up your own library?")
 
 if library_create == "yes":
@@ -65,36 +75,38 @@ if library_create == "yes":
     list_of_books = user_input.split()
     print("Here is your current shelf", list_of_books)
     add_books = input("Would you like to add or subtract from your shelf? Enter 'add' to add more books and 'remove' to remove books: ")
-    
-while browsing: #sets up the continuous loop for user to add/ subtract as they see fit
-    if add_books == "add":
-        browsing = True  
-        new_shelf = input("Enter more titles to add books to your shelf: ")
-        list_of_books.append(new_shelf) #append allows user to continue to add items to list
-        print("Here is your new shelf", list_of_books)
-        break 
-    elif add_books == "remove":
-        browsing = True  
-        new_shelf = input("Enter the titles you would like to remove from your shelf: ")
-        list_of_books.remove(new_shelf)
-        print("Here is your new shelf", list_of_books)
-        break 
-    else:
-        browsing = not True
-        print("Great! You can always add more books to your shelf later.")
-        break #gives user a way out of the loop
+    while browsing: #sets up the continuous loop for user to add/ subtract as they see fit
+        if add_books == "add":
+            browsing = True  
+            new_shelf = input("Enter more titles to add books to your shelf: ")
+            list_of_books.append(new_shelf) #append allows user to continue to add items to list
+            print("Here is your new shelf", list_of_books)
+            break 
+        elif add_books == "remove":
+            browsing = True  
+            new_shelf = input("Enter the titles you would like to remove from your shelf: ")
+            list_of_books.remove(new_shelf)
+            print("Here is your new shelf", list_of_books)
+            break 
+        else:
+            browsing = not True
+            print("Great! You can always add more books to your shelf later.")
+            break #gives user a way out of the loop
 
+#ask user to search for title
+    #user input
+    #set up way to select titles
 
+browse = input("Would you like to borrow a book today? Type 'yes' to browse our shelves: ")
 
-#borrowing
-print("Input a list of books you would like to lend to gest started")
+if browse == "yes":
+    borrow_book = input("Would you like to borrow a book today? Enter the name of a title to browse: ")
+    if borrow_book in user_libraries:
+        print("Hooray", user_name, "has your book!") 
+    else: 
+        print("Sorry!", borrow_book, "is not available at this time")
+         
 
-#background
-    #install packages
-    #set up API 
-    #env with sendgrid API, dummy library emails
-    #use web scraper to get ISBN, author, and cover for Goodreads/Amazon
-    #set up lists to demo
 
 #ask user to add titles and set up library
     #user input
@@ -104,9 +116,7 @@ print("Input a list of books you would like to lend to gest started")
         #use "done" or "exit" to allow user to leave library when complete
     #enter email???
 
-#ask user to search for title
-    #user input
-    #set up way to select titles
+
 
 #search list of libraries
     #group by zip code
@@ -121,15 +131,31 @@ print("Input a list of books you would like to lend to gest started")
     #code has request_email = input("Please enter the user you would like to borrow from.")
     #sendgrid code has request_email embedded
 
+
 selected_user = input("Please enter the name of the user you would like to borrow from: ")
 selected_user = os.environ.get(selected_user, "OOPS, please set env var called 'selected_user'")
 book_request = input("Please enter the name of the book you would like to borrow: ")
+my_user_email = input("Please enter your email address so you can coordinate pickups: ")
 
+book_message = os.path.join(os.path.dirname(__file__), "%s.txt" % my_user_name)
 
+with open(book_message, "w") as file: 
+    file.write(my_user_name)
+    file.write(" would like to borrow your copy of ")
+    file.write(book_request)
+    file.write("\n")
+    file.write("Please reach out to them at ")
+    file.write(my_user_email)
+    file.write(" to coordinate pickup.")
+    file.write("\n")
+    file.write("Have a great day!")
+    file.write("\n")
+        
 from_email = Email(MY_EMAIL_ADDRESS)
 to_email = Email(selected_user)
 subject = "You have a new checkout request"
-message_text = "Amy" + "would like to borrow your copy of" + "book name" + "please reach out to them at" + "user email" + "to coordinate pickup"
+with open(book_message) as fp:
+    message_text = fp.read()
 content = Content("text/plain", message_text)
 mail = Mail(from_email, subject, to_email, content)
 
