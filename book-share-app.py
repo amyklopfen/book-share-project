@@ -1,3 +1,5 @@
+browsing = True 
+
 import os
 from dotenv import load_dotenv
 import sendgrid
@@ -61,6 +63,28 @@ library_create = input("Would you like to set up your own library?")
 if library_create == "yes":
     user_input = input("Great, add books from your shelf to get started: ")
     list_of_books = user_input.split()
+    print("Here is your current shelf", list_of_books)
+    add_books = input("Would you like to add or subtract from your shelf? Enter 'add' to add more books and 'remove' to remove books: ")
+    
+while browsing: #sets up the continuous loop for user to add/ subtract as they see fit
+    if add_books == "add":
+        browsing = True  
+        new_shelf = input("Enter more titles to add books to your shelf: ")
+        list_of_books.append(new_shelf) #append allows user to continue to add items to list
+        print("Here is your new shelf", list_of_books)
+        break 
+    elif add_books == "remove":
+        browsing = True  
+        new_shelf = input("Enter the titles you would like to remove from your shelf: ")
+        list_of_books.remove(new_shelf)
+        print("Here is your new shelf", list_of_books)
+        break 
+    else:
+        browsing = not True
+        print("Great! You can always add more books to your shelf later.")
+        break #gives user a way out of the loop
+
+
 
 #borrowing
 print("Input a list of books you would like to lend to gest started")
