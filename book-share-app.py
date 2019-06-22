@@ -15,6 +15,7 @@ MY_EMAIL_ADDRESS = os.environ.get("MY_EMAIL_ADDRESS", "OOPS, please set env var 
 
 sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
 
+
 #background
     #install packages
     #set up API 
@@ -98,13 +99,17 @@ if library_create == "yes":
     #set up way to select titles
 
 browse = input("Would you like to borrow a book today? Type 'yes' to browse our shelves: ")
+    #matching_products = [p for p in products if int(p["id"]) == int(selected_id)]
 
 if browse == "yes":
     borrow_book = input("Would you like to borrow a book today? Enter the name of a title to browse: ")
-    if borrow_book in user_libraries:
-        print("Hooray", user_name, "has your book!") 
-    else: 
-        print("Sorry!", borrow_book, "is not available at this time")
+    for user in user_libraries:
+        for book in user:
+            if book["title"] == borrow_book:
+                print("Hooray", borrow_book, "is available")
+                break 
+        else: 
+            print("Sorry!", borrow_book, "is not available at this time")
          
 
 
