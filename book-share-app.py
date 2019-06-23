@@ -59,9 +59,9 @@ sarahlazun_library = [{"author":"author", "title":"title", "ISBN": "ISBN", "genr
 {"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}]
 
 user_libraries = [amyklopfen_library, sarahlazun_library, dougschulte_library]
-user_records = [{"username": "amyklopfen", "library": amyklopfen_library},
-            {"username": "sarahlazun", "library": sarahlazun_library},
-            {"username": "dougschulte", "library": dougschulte_library}]
+user_records = [{"username": "amyklopfen", "library_name": amyklopfen_library},
+            {"username": "sarahlazun", "library_name": sarahlazun_library},
+            {"username": "dougschulte", "library_name": dougschulte_library}]
 
 #welcome user, give instructions on how to use library
 print("Welcome to bookshare, a community of mini-libraries. Search for a title, author, or genre to get started.")
@@ -114,20 +114,22 @@ for user in user_libraries:
         book_titles.append(title_list)
 
 for user in user_records: 
-    library_list = user["library"]
+    library_list = user["library_name"]
     libraries.append(library_list)
     user_name_list = user["username"]
     users.append(user_name_list)
 
-user_library_selected = []
 
 if browse == "yes":
     borrow_book = input("Would you like to borrow a book today? Enter the name of a title to browse: ")
     if borrow_book in book_titles:
         print("Hooray,", borrow_book, "is available!")
-
+        for user in user_records:
+            matching_library = [b for b in user["library_name"] if b["title"] == borrow_book] 
+            print(matching_library.dict)
     else: 
         print("Sorry,", borrow_book, "is not available at this time!")
+
 
         
 quit()
