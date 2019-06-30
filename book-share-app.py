@@ -51,6 +51,7 @@ user_libraries = [{"user": "amyklopfen", "library": [{"author":"Sanderson", "tit
 {"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}]}]
 
 #print(user_libraries[0]["user"])
+#print(user_libraries[0]["library"][0]["title"])
 
 
 #welcome user, give instructions on how to use library
@@ -125,7 +126,6 @@ if library_create == "yes":
             browsing = not True
             print("Great! You can always add more books to your shelf later.")
             break #gives user a way out of the loop
-quit()
 
 browse = input("Would you like to borrow a book today? Type 'yes' to browse our shelves: ")
     #matching_products = [p for p in products if int(p["id"]) == int(selected_id)]
@@ -134,17 +134,10 @@ book_titles = []
 users = []
 libraries = []
 
-for user in user_libraries:
-    for book in user:
-        title_list = book["title"]
+for i in user_libraries[0:]: 
+    for b in i["library"][0:]:
+        title_list = (b["title"])
         book_titles.append(title_list)
-
-for user in user_records: 
-    library_list = user["library_name"]
-    libraries.append(library_list)
-    user_name_list = user["username"]
-    users.append(user_name_list)
-
 
 if browse == "yes":
     borrow_book = input("Would you like to borrow a book today? Enter the name of a title to browse: ")
