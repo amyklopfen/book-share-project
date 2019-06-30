@@ -1,5 +1,6 @@
 browsing = True 
-#install this for Google API: pip install -U google-api-python-client
+
+#install packages and modules to get started
 import os
 import json
 from dotenv import load_dotenv
@@ -15,8 +16,12 @@ load_dotenv()
 
 import pprint
 
+#install this for Google API: pip install -U google-api-python-client
+#Google API instructions found here: https://developers.google.com/books/docs/v1/using
+
 GOOGLE_BOOKS_API_KEY = os.environ.get("GOOGLE_BOOKS_API_KEY")
 
+#function for validating user inputs for removing items from shelf. Consulted https://stackoverflow.com/questions/8653516/python-list-of-dictionaries-search/8653568 for help
 def remove_verify(book_name):
     for i in list_of_books:
         if i['title'] == book_lookup:
@@ -27,7 +32,7 @@ def remove_verify(book_name):
     return p
 
 
-
+#dummy libraries set up for "existing users" to demonstrate browse function
 user_libraries = [{"user": "amyklopfen", "library": [{"author":"Sanderson", "title":"The Way of Kings", "genre":"sci-fi"}, 
 {"author":"Tolkein", "title":"The Hobbit", "genre":"Young Adult Fiction"},
 {"author":"Sanderson", "title":"The Hero of the Ages", "genre":"Fiction"},
@@ -52,7 +57,7 @@ print("Welcome to bookshare, a community of mini-libraries.")
 #set up profile - append email to user email list
 my_user_name = input("Enter a username to get started: ")
 
-#create list for user to add titles to
+#create list for user to add titles to. #create dictionary with user information/shelf to ultimately be added to user_libraries
 list_of_books = []
 user_dict = {"user": my_user_name, "library":list_of_books}
 
@@ -92,7 +97,7 @@ if library_create == "yes":
             response = requests.get(book_request_url)
             parsed_response = json.loads(response.text)
 
-            if parsed_response["totalItems"] == 0:
+            if parsed_response["totalItems"] == 0: #set up to ensure that a title exists; there is still a functioning web page even if a book does not exist. totalItems == 0 means no books exist with that title
                 print("Sorry, couldn't find any data for that title.") #courtesy of stack overflow on error handling with json loads
                 quit()
             elif book_lookup == "done".lower():
@@ -117,7 +122,7 @@ if library_create == "yes":
         if add_books == "remove":
             browsing = True  
             book_lookup = input("Enter the title you would like to remove from your shelf: ")
-            book_remove = remove_verify(book_lookup)
+            book_remove = remove_verify(book_lookup) #function ensures entire list of dictionaries is searched and the proper book is removed
             print(book_remove)
             break 
         else:
@@ -125,8 +130,10 @@ if library_create == "yes":
             print("Great! You can always add more books to your shelf later.")
             break #gives user a way out of the loop
 
+
+#browse and borrow feature - allows user to search the shelves and connect with another user to check out a book
+
 browse = input("Would you like to borrow a book today? Type 'yes' to browse our shelves: ")
-    #matching_products = [p for p in products if int(p["id"]) == int(selected_id)]
 
 book_titles = []
 
@@ -145,15 +152,18 @@ else:
     print("Thanks for stopping by! Come again soon.")
     quit()
 
+#shows the users who have a copy of the desired book so that the borrower can connect with them
 for i in user_libraries[0:]:
     for b in i["library"][0:]:
         if borrow_book == b["title"]:
             print(i["user"], "has a copy of", borrow_book)
-    
+
+#the "checkout" space where the user selects borrower and book title    
 selected_user = input("Please enter the name of the user you would like to borrow from: ")
 book_request = input("Please enter the name of the book you would like to borrow: ")
 my_user_email = input("Please enter your email address so you can coordinate pickups: ")
 
+#turned message text to text file for nicer formatting in email - consulted Doug Schulte for on emailing .txt!
 book_message = os.path.join(os.path.dirname(__file__), "%s.txt" % my_user_name)
 
 with open(book_message, "w") as file: 
