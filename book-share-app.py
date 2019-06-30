@@ -21,16 +21,16 @@ GOOGLE_BOOKS_API_KEY = os.environ.get("GOOGLE_BOOKS_API_KEY")
 
 sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
 
-amyklopfen_library = [{"author":"Sanderson", "title":"The Way of Kings", "ISBN": 9780765365279, "genre":"sci-fi"}, 
-{"author":"Tolkein", "title":"The Hobbit", "ISBN": 9780345339683, "genre":"fantasy"},
-{"author":"Sanderson", "title":"The Hero of the Ages", "ISBN": 9780765377159, "genre":"sci-fi"},
-{"author":"FLynn", "title":"Gone Girl", "ISBN": 9780307588371, "genre":"thriller"},
-{"author":"Altwater-Rhodes", "title":"Hawksong", "ISBN": 9780440238034, "genre":"romance"},
-{"author":"Hanley", "title":"The Seer and the Sword", "ISBN": 9780823415328, "genre":"fantasy"},
-{"author":"Tolkein", "title":"The Fellowship of the Ring", "ISBN": 9780395489314, "genre":"fantasy"},
-{"author":"Bennett", "title":"City of Stairs", "ISBN": 9780804137171, "genre":"fantasy"},
-{"author":"Desmond", "title":"Evicted", "ISBN": 9780553447453, "genre":"non-fiction"},
-{"author":"Adichie", "title":"Purple Hibiscus", "ISBN": 9781616202415, "genre":"literary"}]
+amyklopfen_library = [{"author":"Sanderson", "title":"The Way of Kings", "genre":"sci-fi"}, 
+{"author":"Tolkein", "title":"The Hobbit", "genre":"Young Adult"},
+{"author":"Sanderson", "title":"The Hero of the Ages", "genre":"sci-fi"},
+{"author":"FLynn", "title":"Gone Girl", "genre":"thriller"},
+{"author":"Altwater-Rhodes", "title":"Hawksong", "genre":"romance"},
+{"author":"Hanley", "title":"The Seer and the Sword", "genre":"fantasy"},
+{"author":"Tolkein", "title":"The Fellowship of the Ring", "genre":"fantasy"},
+{"author":"Bennett", "title":"City of Stairs", "genre":"fantasy"},
+{"author":"Desmond", "title":"Evicted", "genre":"non-fiction"},
+{"author":"Adichie", "title":"Purple Hibiscus", "genre":"literary"}]
 
 dougschulte_library = [{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}, 
 {"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
@@ -78,7 +78,11 @@ if library_create == "yes":
     response = requests.get(book_request_url)
     parsed_response = json.loads(response.text)
     book_keys = parsed_response["items"][0]["volumeInfo"]
-    print(book_keys)
+    author_keys = book_keys["authors"]
+    title_keys = book_keys["title"]
+    genre_keys = book_keys["categories"]
+    user_books = {"author":author_keys, "title":title_keys, "genre":genre_keys}
+    print(user_books)
     quit()
     if parsed_response["totalItems"] == 0:
         print("Sorry, couldn't find any data for that title.") #courtesy of stack overflow on error handling with json loads
