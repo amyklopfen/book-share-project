@@ -69,7 +69,7 @@ user_dict = {}
 my_user_name = input("Enter a username to get started: ")
 
 #ask user to add titles and set up library
-library_create = input("Would you like to set up your own library?")
+library_create = input("Would you like to set up your own library?: ")
 
 if library_create == "yes":
     book_lookup = input("Great, add a book from your shelf to get started: ")
@@ -77,24 +77,20 @@ if library_create == "yes":
     book_request_url = f"https://www.googleapis.com/books/v1/volumes?q={book_lookup}+inauthor:{selected_author}&key={GOOGLE_BOOKS_API_KEY}"
     response = requests.get(book_request_url)
     parsed_response = json.loads(response.text)
-    book_keys = parsed_response["items"][0]["volumeInfo"]
-    author_keys = book_keys["authors"]
-    title_keys = book_keys["title"]
-    genre_keys = book_keys["categories"]
-    user_books = {"author":author_keys, "title":title_keys, "genre":genre_keys}
-    print(user_books)
-    quit()
+
     if parsed_response["totalItems"] == 0:
         print("Sorry, couldn't find any data for that title.") #courtesy of stack overflow on error handling with json loads
         quit()
-    #else: 
-     #   au_key = parsed_response["authors"]
-      #  genre_key = parsed_response["volumeInfo"]["categories"]
-       # ISBN_key = parsed_response["volumeInfo"]["identifier"]
-        #ISBN_key = parsed_response["volumeInfo"]["title"]
-
-#        print("Here is your current shelf", list_of_books)
-        quit()
+    else: 
+        book_keys = parsed_response["items"][0]["volumeInfo"]
+        author_keys = book_keys["authors"]
+        author_keys = ''.join(author_keys)
+        title_keys = book_keys["title"]
+        genre_keys = book_keys["categories"]
+        genre_keys = ''.join(genre_keys)
+        user_books = {"author":author_keys, "title":title_keys, "genre":genre_keys}
+        list_of_books.append(user_books)
+        print("Here is your current shelf", list_of_books)
 
     add_books = input("Would you like to add or subtract from your shelf? Enter 'add' to add more books and 'remove' to remove books: ")
     while browsing: #sets up the continuous loop for user to add/ subtract as they see fit
