@@ -1,29 +1,25 @@
 browsing = True 
-
+#install this for Google API: pip install -U google-api-python-client
 import os
+import json
 from dotenv import load_dotenv
 import sendgrid
 from sendgrid.helpers.mail import * # info drawn from send notification exercise.
 import datetime
 
+import requests 
+import apiclient
+from apiclient import discovery
+
 load_dotenv()
 
 import pprint
 
-SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "OOPS, please set env var called 'SENDGRID_API_KEY'")
-MY_EMAIL_ADDRESS = os.environ.get("MY_EMAIL_ADDRESS", "OOPS, please set env var called 'MY_EMAIL_ADDRESS'")
+SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
+MY_EMAIL_ADDRESS = os.environ.get("MY_EMAIL_ADDRESS")
+GOOGLE_BOOKS_API_KEY = os.environ.get("GOOGLE_BOOKS_API_KEY")
 
 sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
-
-
-#background
-    #install packages
-    #set up API 
-    #env with sendgrid API, dummy library emails
-    #use web scraper to get ISBN, author, and cover for Goodreads/Amazon
-    #set up lists to demo
-
-#lender_list = [amyklopfen, dougschulte, sarahlazun]
 
 amyklopfen_library = [{"author":"Sanderson", "title":"The Way of Kings", "ISBN": 9780765365279, "genre":"sci-fi"}, 
 {"author":"Tolkein", "title":"The Hobbit", "ISBN": 9780345339683, "genre":"fantasy"},
@@ -59,47 +55,67 @@ sarahlazun_library = [{"author":"author", "title":"title", "ISBN": "ISBN", "genr
 {"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}]
 
 user_libraries = [amyklopfen_library, sarahlazun_library, dougschulte_library]
-user_records = [{"username": "amyklopfen", "library_name": amyklopfen_library},
-            {"username": "sarahlazun", "library_name": sarahlazun_library},
-            {"username": "dougschulte", "library_name": dougschulte_library}]
+user_records = [{"username": "amyklopfen", "library": amyklopfen_library},
+            {"username": "sarahlazun", "library": sarahlazun_library},
+            {"username": "dougschulte", "library": dougschulte_library}]
 
 #welcome user, give instructions on how to use library
 print("Welcome to bookshare, a community of mini-libraries. Search for a title, author, or genre to get started.")
 
-#list of user emails? 
+#create list for user to add titles to
+list_of_books = []
+user_dict = {}
 #set up profile - append email to user email list
 my_user_name = input("Enter a username to get started: ")
 
-#lending
-
+#ask user to add titles and set up library
 library_create = input("Would you like to set up your own library?")
 
 if library_create == "yes":
-    user_input = input("Great, add books from your shelf to get started: ")
-    list_of_books = user_input.split()
-    print("Here is your current shelf", list_of_books)
+    book_lookup = input("Great, add a book from your shelf to get started: ")
+    selected_author = input("Now enter the author of the book: ")
+    book_request_url = f"https://www.googleapis.com/books/v1/volumes?q={book_lookup}+inauthor:{selected_author}&key={GOOGLE_BOOKS_API_KEY}"
+    response = requests.get(book_request_url)
+    parsed_response = json.loads(response.text)
+    if parsed_response["totalItems"] == 0:
+        print("Sorry, couldn't find any data for that title.") #courtesy of stack overflow on error handling with json loads
+        quit()
+    else: 
+        my_dict = dict((i["title"], i["authors"])  for i in parsed_response)
+        list_of_books.append(my_dict)
+        print("Here is your current shelf", list_of_books)
+        quit()
+
     add_books = input("Would you like to add or subtract from your shelf? Enter 'add' to add more books and 'remove' to remove books: ")
     while browsing: #sets up the continuous loop for user to add/ subtract as they see fit
         if add_books == "add":
             browsing = True  
-            new_shelf = input("Enter more titles to add books to your shelf: ")
-            list_of_books.append(new_shelf) #append allows user to continue to add items to list
-            print("Here is your new shelf", list_of_books)
-            break 
+            book_lookup = input("Enter more titles to add books to your shelf: ")
+            book_request_url = f"https://www.googleapis.com/books/v1/volumes?q={book_lookup}+inauthor:{selected_author}&key={GOOGLE_BOOKS_API_KEY}"
+            response = requests.get(book_request_url)
+            parsed_response = json.loads(response.text)
+            if "Error Message" in parsed_response: #
+                print("Sorry, couldn't find any data for that title.")
+                quit() 
+                
+            else: 
+                list_of_books.append(book_lookup) #append allows user to continue to add items to list
+                print("Here is your new shelf", list_of_books)
+                user_libraries.append(list_of_books) #append user to user libraries
+                break 
         elif add_books == "remove":
             browsing = True  
-            new_shelf = input("Enter the titles you would like to remove from your shelf: ")
-            list_of_books.remove(new_shelf)
-            print("Here is your new shelf", list_of_books)
+            book_lookup = input("Enter the titles you would like to remove from your shelf: ")
+            list_of_books.remove(book_lookup)
+            print("Here is your new shelf", list_of_books) 
+            user_libraries.append(list_of_books)    #append user to user libraries
             break 
         else:
             browsing = not True
+            user_libraries.append(list_of_books)    #append user to user libraries
             print("Great! You can always add more books to your shelf later.")
             break #gives user a way out of the loop
-
-#ask user to search for title
-    #user input
-    #set up way to select titles
+quit()
 
 browse = input("Would you like to borrow a book today? Type 'yes' to browse our shelves: ")
     #matching_products = [p for p in products if int(p["id"]) == int(selected_id)]
@@ -122,31 +138,18 @@ for user in user_records:
 
 if browse == "yes":
     borrow_book = input("Would you like to borrow a book today? Enter the name of a title to browse: ")
-    if borrow_book in book_titles:
+    if borrow_book in book_titles:    
         print("Hooray,", borrow_book, "is available!")
-        for user in user_records:
-            matching_library = [b for b in user["library_name"] if b["title"] == borrow_book] 
-            print(matching_library.dict)
     else: 
         print("Sorry,", borrow_book, "is not available at this time!")
 
-
-        
-quit()
-
-
-
-
-
-#ask user to add titles and set up library
+    
     #user input
     #validate user inputs
         #check Goodreads API to make sure title exists
         #ensure input is valid (not int)
         #use "done" or "exit" to allow user to leave library when complete
     #enter email???
-
-
 
 #search list of libraries
     #group by zip code
@@ -163,7 +166,6 @@ quit()
 
 
 selected_user = input("Please enter the name of the user you would like to borrow from: ")
-selected_user = os.environ.get(selected_user, "OOPS, please set env var called 'selected_user'")
 book_request = input("Please enter the name of the book you would like to borrow: ")
 my_user_email = input("Please enter your email address so you can coordinate pickups: ")
 
@@ -189,10 +191,7 @@ with open(book_message) as fp:
 content = Content("text/plain", message_text)
 mail = Mail(from_email, subject, to_email, content)
 
-
 response = sg.client.mail.send.post(request_body=mail.get())
-
-
 
 pp = pprint.PrettyPrinter(indent=4)
 
