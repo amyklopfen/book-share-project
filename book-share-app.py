@@ -30,25 +30,25 @@ user_libraries = [{"user": "amyklopfen", "library": [{"author":"Sanderson", "tit
 {"author":"Tolkein", "title":"The Fellowship of the Ring", "genre":"fantasy"},
 {"author":"Bennett", "title":"City of Stairs", "genre":"fantasy"},
 {"author":"Desmond", "title":"Evicted", "genre":"non-fiction"},
-{"author":"Adichie", "title":"Purple Hibiscus", "genre":"literary"}]}, {"user": "dougschulte", "library": [{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}, 
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "genre":"genre"}]}, {"user": "sarahlazun", "library": [{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}, 
+{"author":"Adichie", "title":"Purple Hibiscus", "genre":"literary"}]}, {"user": "dougschulte", "library": [{"author":"author", "title":"title", "genre":"genre"}, 
+{"author":"author", "title":"title", "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"},
 {"author":"author", "title":"title",  "genre":"genre"},
 {"author":"author", "title":"title", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}]}]
+{"author":"author", "title":"title",  "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"},
+{"author":"author", "title":"title",  "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"}]}, {"user": "sarahlazun", "library": [{"author":"author", "title":"title",  "genre":"genre"}, 
+{"author":"author", "title":"title",  "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"},
+{"author":"author", "title":"title",  "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"}]}]
 
 #print(user_libraries[0]["user"])
 #print(user_libraries[0]["library"][0]["title"])
@@ -146,13 +146,12 @@ if browse == "yes":
     else: 
         print("Sorry,", borrow_book, "is not available at this time!")
 
+for i in user_libraries[0:]:
+    for b in i["library"][0:]:
+        if borrow_book == b["title"]:
+            print(i["user"], "has a copy of", borrow_book)
     
-    #user input
-    #validate user inputs
-        #check Goodreads API to make sure title exists
-        #ensure input is valid (not int)
-        #use "done" or "exit" to allow user to leave library when complete
-    #enter email???
+quit()
 
 #search list of libraries
     #group by zip code
