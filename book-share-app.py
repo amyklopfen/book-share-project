@@ -77,13 +77,19 @@ if library_create == "yes":
     book_request_url = f"https://www.googleapis.com/books/v1/volumes?q={book_lookup}+inauthor:{selected_author}&key={GOOGLE_BOOKS_API_KEY}"
     response = requests.get(book_request_url)
     parsed_response = json.loads(response.text)
+    book_keys = parsed_response["items"][0]["volumeInfo"]
+    print(book_keys)
+    quit()
     if parsed_response["totalItems"] == 0:
         print("Sorry, couldn't find any data for that title.") #courtesy of stack overflow on error handling with json loads
         quit()
-    else: 
-        my_dict = dict((i["title"], i["authors"])  for i in parsed_response)
-        list_of_books.append(my_dict)
-        print("Here is your current shelf", list_of_books)
+    #else: 
+     #   au_key = parsed_response["authors"]
+      #  genre_key = parsed_response["volumeInfo"]["categories"]
+       # ISBN_key = parsed_response["volumeInfo"]["identifier"]
+        #ISBN_key = parsed_response["volumeInfo"]["title"]
+
+#        print("Here is your current shelf", list_of_books)
         quit()
 
     add_books = input("Would you like to add or subtract from your shelf? Enter 'add' to add more books and 'remove' to remove books: ")
