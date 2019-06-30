@@ -39,9 +39,9 @@ user_libraries = [{"user": "amyklopfen", "library": [{"author":"Sanderson", "tit
 {"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
 {"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
 {"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}]}, {"user": "sarahlazun", "library": [{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}, 
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"}]}, {"user": "sarahlazun", "library": [{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}, 
+{"author":"author", "title":"title",  "genre":"genre"},
+{"author":"author", "title":"title", "genre":"genre"},
 {"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
 {"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
 {"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
@@ -111,16 +111,15 @@ if library_create == "yes":
                 user_books = {"author":author_keys, "title":title_keys, "genre":genre_keys}
                 list_of_books.append(user_books)
                 print("Here is your new shelf", list_of_books)  
-
+                add_books = input("Add more books? Enter 'add' to add to your shelf, 'remove' to delete titles, and 'done' to exit: ")
         if add_books == "remove":
             browsing = True  
             book_lookup = input("Enter the titles you would like to remove from your shelf: ")
             for i in list_of_books: 
-                for book in i:
-                    if book["title"] == book_lookup:
-                        list_of_books.remove(i)
-                        print("Here is your new shelf", list_of_books) 
-                        user_libraries.append(list_of_books)    #append user to user libraries
+                if i["title"] == book_lookup:
+                    list_of_books.remove(i)
+                    print("Here is your new shelf", list_of_books) 
+                    user_libraries.append(list_of_books)    #append user to user libraries
                     break 
         else:
             browsing = not True
