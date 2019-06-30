@@ -21,7 +21,7 @@ GOOGLE_BOOKS_API_KEY = os.environ.get("GOOGLE_BOOKS_API_KEY")
 
 sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
 
-amyklopfen_library = [{"author":"Sanderson", "title":"The Way of Kings", "genre":"sci-fi"}, 
+user_libraries = [{"user": "amyklopfen", "library": [{"author":"Sanderson", "title":"The Way of Kings", "genre":"sci-fi"}, 
 {"author":"Tolkein", "title":"The Hobbit", "genre":"Young Adult"},
 {"author":"Sanderson", "title":"The Hero of the Ages", "genre":"sci-fi"},
 {"author":"FLynn", "title":"Gone Girl", "genre":"thriller"},
@@ -30,41 +30,34 @@ amyklopfen_library = [{"author":"Sanderson", "title":"The Way of Kings", "genre"
 {"author":"Tolkein", "title":"The Fellowship of the Ring", "genre":"fantasy"},
 {"author":"Bennett", "title":"City of Stairs", "genre":"fantasy"},
 {"author":"Desmond", "title":"Evicted", "genre":"non-fiction"},
-{"author":"Adichie", "title":"Purple Hibiscus", "genre":"literary"}]
+{"author":"Adichie", "title":"Purple Hibiscus", "genre":"literary"}]}, {"user": "dougschulte", "library": [{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}, 
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}]}, {"user": "sarahlazun", "library": [{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}, 
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
+{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}]}]
 
-dougschulte_library = [{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}, 
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}]
+#print(user_libraries[0]["user"])
 
-sarahlazun_library = [{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}, 
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"},
-{"author":"author", "title":"title", "ISBN": "ISBN", "genre":"genre"}]
-
-user_libraries = [amyklopfen_library, sarahlazun_library, dougschulte_library]
-user_records = [{"username": "amyklopfen", "library": amyklopfen_library},
-            {"username": "sarahlazun", "library": sarahlazun_library},
-            {"username": "dougschulte", "library": dougschulte_library}]
 
 #welcome user, give instructions on how to use library
 print("Welcome to bookshare, a community of mini-libraries. Search for a title, author, or genre to get started.")
 
 #create list for user to add titles to
 list_of_books = []
-user_dict = {}
 #set up profile - append email to user email list
 my_user_name = input("Enter a username to get started: ")
 
@@ -92,33 +85,45 @@ if library_create == "yes":
         list_of_books.append(user_books)
         print("Here is your current shelf", list_of_books)
 
-    add_books = input("Would you like to add or subtract from your shelf? Enter 'add' to add more books and 'remove' to remove books: ")
-    while browsing: #sets up the continuous loop for user to add/ subtract as they see fit
+    while browsing:
+        add_books = input("Would you like to add or subtract from your shelf? Enter 'add' to add more books and 'remove' to remove books: ")
+        #sets up the continuous loop for user to add/ subtract as they see fit
         if add_books == "add":
             browsing = True  
-            book_lookup = input("Enter more titles to add books to your shelf: ")
+            book_lookup = input("Enter more titles to add books to your shelf. Enter 'done' when you are finished: ")
+            if book_lookup == "done".lower():
+                break 
+            selected_author = input("Now enter the author of the book: ")
             book_request_url = f"https://www.googleapis.com/books/v1/volumes?q={book_lookup}+inauthor:{selected_author}&key={GOOGLE_BOOKS_API_KEY}"
             response = requests.get(book_request_url)
             parsed_response = json.loads(response.text)
-            if "Error Message" in parsed_response: #
-                print("Sorry, couldn't find any data for that title.")
-                quit() 
-                
+
+            if parsed_response["totalItems"] == 0:
+                print("Sorry, couldn't find any data for that title.") #courtesy of stack overflow on error handling with json loads
+                quit()
             else: 
-                list_of_books.append(book_lookup) #append allows user to continue to add items to list
-                print("Here is your new shelf", list_of_books)
-                user_libraries.append(list_of_books) #append user to user libraries
-                break 
-        elif add_books == "remove":
+                book_keys = parsed_response["items"][0]["volumeInfo"]
+                author_keys = book_keys["authors"]
+                author_keys = ''.join(author_keys)
+                title_keys = book_keys["title"]
+                genre_keys = book_keys["categories"]
+                genre_keys = ''.join(genre_keys)
+                user_books = {"author":author_keys, "title":title_keys, "genre":genre_keys}
+                list_of_books.append(user_books)
+                print("Here is your new shelf", list_of_books)  
+
+        if add_books == "remove":
             browsing = True  
             book_lookup = input("Enter the titles you would like to remove from your shelf: ")
-            list_of_books.remove(book_lookup)
-            print("Here is your new shelf", list_of_books) 
-            user_libraries.append(list_of_books)    #append user to user libraries
-            break 
+            for i in list_of_books: 
+                for book in i:
+                    if book["title"] == book_lookup:
+                        list_of_books.remove(i)
+                        print("Here is your new shelf", list_of_books) 
+                        user_libraries.append(list_of_books)    #append user to user libraries
+                    break 
         else:
             browsing = not True
-            user_libraries.append(list_of_books)    #append user to user libraries
             print("Great! You can always add more books to your shelf later.")
             break #gives user a way out of the loop
 quit()
