@@ -84,7 +84,6 @@ if library_create == "yes":
         user_books = {"author":author_keys, "title":title_keys, "genre":genre_keys}
         list_of_books.append(user_books)
         print("Here is your current shelf", list_of_books)
-        user_libraries.append(user_dict.copy())
 
     while browsing:
         add_books = input("Would you like to add or subtract from your shelf? Enter 'add' to add more books and 'remove' to remove books: ")
@@ -93,19 +92,19 @@ if library_create == "yes":
             browsing = True  
             book_lookup = input("Enter more titles to add books to your shelf. Enter 'done' when you are finished: ")
             selected_author = input("Now enter the author of the book: ")
-            book_request_url = f"https://www.googleapis.com/books/v1/volumes?q={book_lookup}+inauthor:{selected_author}&key={GOOGLE_BOOKS_API_KEY}"
+            book_request_url = f"https://www.googleapis.com/books/v1/volumes?q={book_lookup}+inauthor:{selected_author}&key={GOOGLE_BOOKS_API_KEY}" #referred to robo advisor exercise for setting up api validation
             response = requests.get(book_request_url)
             parsed_response = json.loads(response.text)
 
             if parsed_response["totalItems"] == 0: #set up to ensure that a title exists; there is still a functioning web page even if a book does not exist. totalItems == 0 means no books exist with that title
-                print("Sorry, couldn't find any data for that title.") #courtesy of stack overflow on error handling with json loads
+                print("Sorry, couldn't find any data for that title.") ##referred to stack overflow for setting up error handling with json loads: https://stackoverflow.com/questions/8383136/parsing-json-and-searching-through-it
                 quit()
             elif book_lookup == "done".lower():
                 break  
             else: 
                 browsing = True
                 if parsed_response["totalItems"] == 0:
-                    print("Sorry, couldn't find any data for that title.") #courtesy of stack overflow on error handling with json loads
+                    print("Sorry, couldn't find any data for that title.") #referred to stack overflow for setting up error handling with json loads: https://stackoverflow.com/questions/8383136/parsing-json-and-searching-through-it
                     quit()
                 else:
                     book_keys = parsed_response["items"][0]["volumeInfo"]
@@ -117,23 +116,22 @@ if library_create == "yes":
                     user_books = {"author":author_keys, "title":title_keys, "genre":genre_keys}
                     list_of_books.append(user_books)
                     print("Here is your new shelf", list_of_books)
-                    user_libraries.append(user_dict.copy()) #append user to user libraries 
                 continue 
         if add_books == "remove":
             browsing = True  
             book_lookup = input("Enter the title you would like to remove from your shelf: ")
             book_remove = remove_verify(book_lookup) #function ensures entire list of dictionaries is searched and the proper book is removed
             print(book_remove)
+            book_remove = remove_verify(user_books) #make sure the book is also removed from the list to be appended to master list
             break 
         else:
             browsing = not True
             print("Great! You can always add more books to your shelf later.")
             break #gives user a way out of the loop
 
+user_libraries.append(user_dict.copy()) #append user to user libraries 
 
 #browse and borrow feature - allows user to search the shelves and connect with another user to check out a book
-
-browse = input("Would you like to borrow a book today? Type 'yes' to browse our shelves: ")
 
 book_titles = []
 
@@ -142,28 +140,31 @@ for i in user_libraries[0:]:
         title_list = (b["title"])
         book_titles.append(title_list)
 
-if browse == "yes":
-    borrow_book = input("Would you like to borrow a book today? Enter the name of a title to browse: ")
-    if borrow_book in book_titles:    
-        print("Hooray,", borrow_book, "is available!")
+while browsing: 
+    browse = input("Would you like to borrow a book today? Type 'yes' to browse our shelves. Type 'done' to proceed to checkout: ")
+    if browse == "yes":
+        borrow_book = input("Enter the name of a title to browse: ")
+        if borrow_book in book_titles:    
+            print("Hooray,", borrow_book, "is available!")
+        #shows the users who have a copy of the desired book so that the borrower can connect with them
+            for i in user_libraries[0:]:
+                for b in i["library"][0:]:
+                    if borrow_book == b["title"]:
+                        print(i["user"], "has a copy of", borrow_book)
+        else: 
+            print("Sorry,", borrow_book, "is not available at this time!")
+    elif browse == "done".lower():
+        break 
     else: 
-        print("Sorry,", borrow_book, "is not available at this time!")
-else: 
-    print("Thanks for stopping by! Come again soon.")
-    quit()
-
-#shows the users who have a copy of the desired book so that the borrower can connect with them
-for i in user_libraries[0:]:
-    for b in i["library"][0:]:
-        if borrow_book == b["title"]:
-            print(i["user"], "has a copy of", borrow_book)
+        print("Thanks for stopping by! Come again soon.")
+        quit()
 
 #the "checkout" space where the user selects borrower and book title    
 selected_user = input("Please enter the name of the user you would like to borrow from: ")
 book_request = input("Please enter the name of the book you would like to borrow: ")
 my_user_email = input("Please enter your email address so you can coordinate pickups: ")
 
-#turned message text to text file for nicer formatting in email - consulted Doug Schulte for on emailing .txt!
+#turned message text to text file for nicer formatting in email - consulted Doug Schulte for help on emailing content of .txt file!
 book_message = os.path.join(os.path.dirname(__file__), "%s.txt" % my_user_name)
 
 with open(book_message, "w") as file: 
@@ -178,6 +179,7 @@ with open(book_message, "w") as file:
     file.write("Have a great day!")
     file.write("\n")
 
+#referred to notification exercise for setting up email service
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
 MY_EMAIL_ADDRESS = os.environ.get("MY_EMAIL_ADDRESS")
 selected_user = os.environ.get(selected_user)
