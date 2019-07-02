@@ -16,7 +16,13 @@ Make sure you have a Sendgrid account and a Sendgrid API Key. If you don't have 
 
 ## Securing Sensitive Information in ENV 
 
-Once you have the Sendgrid API Key, save it to the env file with a variable like Sendgrid_API_KEY. Save the email address you used to set up the Sendgrid account to a variable MY_EMAIL_ADDRESS:
+Once you have the Sendgrid API Key, save it to the env file with the variable Sendgrid_API_KEY:
+
+```sh
+SENDGRID_API_KEY = "Input Sendgrid API Here"
+```
+
+ Save the email address you used to set up the Sendgrid account to a variable MY_EMAIL_ADDRESS:
 
 ```sh
 MY_EMAIL_ADDRESS = "Input Sendgrid Email Address Here"
@@ -35,7 +41,10 @@ Save any usernames and their corresponding emails to the env file. For example, 
 ```sh
 janedoe = janedoe@nyu.edu
 ```
-Make sure any user you want to include in the app has an email address saved in the env file
+
+Make sure any user you want to include in the app has an email address saved in the env file. 
+
+There are currently dummy usernames (amyklopfen, line 36, dougschulte, line 45, and sarahlazun, line 49) in the user_libraries in the code. You will need to go into the code and replace the dummy usernames with the usernames you saved in the env file in order to run the app. 
 
 ## Setting up your virtual environment
 
@@ -67,6 +76,7 @@ pip install -U google-api-python-client
 ```
 
 You may also need to use pip install to install the following packages if you have not already installed them: 
+
 ```sh
 python-env
 requests
